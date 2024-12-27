@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Delete Note</title>
+    <style>
+        /* 全局样式基础设置 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #333;
+            padding: 20px 0;
+            background-color: #ddd;
+        }
+
+        /* 删除确认内容区域样式 */
+        div {
+            width: 60%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        form input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form input[type="submit"]:hover {
+            background-color: #c82333;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: #007bff;
+            margin-top: 15px;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Are you sure you want to delete this note?</h1>
+    <div>
+        <p>Content: {{ note['content'] }}</p>
+        <form action="{{ url_for('delete_note', note_id=note['ID']) }}" method="post">
+            <input type="submit" value="Yes, Delete">
+        </form>
+        <a href="{{ url_for('index') }}">Cancel</a>
+    </div>
+</body>
+
+</html>

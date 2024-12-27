@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Notes</title>
+    <style>
+        /* 全局字体设置 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #343a40;
+            padding: 20px 0;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* 笔记列表整体样式 */
+     .notes-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            width: 80%;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 每条笔记的样式 */
+     .note-item {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 鼠标悬停在笔记上的样式 */
+     .note-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 根据不同颜色标记设置笔记文本颜色 */
+     .note-item.red p {
+            color: red;
+        }
+
+     .note-item.orange p {
+            color: orange;
+        }
+
+     .note-item.green p {
+            color: green;
+        }
+
+        /* 笔记内容样式 */
+     .note-item p {
+            margin: 0;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+
+        /* 编辑、删除、颜色标记等按钮和表单的公共样式 */
+     .action-button,
+     .action-form {
+            display: inline-block;
+            margin-left: 10px;
+            text-decoration: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* 编辑按钮样式 */
+     .edit {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+        }
+
+     .edit:hover {
+            background-color: #0056b3;
+        }
+
+        /* 删除按钮样式 */
+     .delete {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+        }
+
+     .delete:hover {
+            background-color: #c82333;
+        }
+
+        /* 颜色标记表单选择框样式 */
+     .color-form select {
+            padding: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        /* 颜色标记表单提交按钮样式 */
+     .color-form input[type="submit"] {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+			border: none;
+        }
+
+     .color-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* 添加笔记的表单样式 */
+     .add-note-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 添加笔记的表单输入框样式 */
+     .add-note-form input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            color: #495057;
+        }
+
+        /* 添加笔记的表单提交按钮样式 */
+     .add-note-form input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 添加笔记的表单提交按钮鼠标悬停样式 */
+     .add-note-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* 用于包裹拖拽图标的容器样式 */
+     .drag-handle {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background-color: #ced4da;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 包裹拖拽图标容器鼠标悬停样式 */
+     .drag-handle:hover {
+            background-color: #adb5bd;
+        }
+
+        /* 拖拽图标样式 */
+       .drag-handle svg {
+            width: 12px;
+            height: 12px;
+            fill: #495057;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #userManagementLink {
+            margin: 10px;
+            display: none;  /* 初始隐藏，管理员登录后显示 */
+        }
+    </style>
+    <!-- 引入Sortable库的CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+</head>
+
+<body>
+    <h1>Notes</h1>
+    {% if 'user_id' in session %}
+    <button id="logoutButton">Logout</button>
+    {% if session.get('is_admin', False) %}
+    <button href="/userManagement" id="userManagementLink" style="display: inline-block;">User Manager</button>
+    {% endif %}
+    {% else %}
+    <button id="loginButton">Login</button>
+    <a href="/register" id="registerLink">Register</a>
+    {% endif %}
+    <ul id="notes-list" class="notes-list">
+        {% for note in notes %}
+        <li class="note-item {{ note['color_tag'] }}" data-note-id="{{ note['ID'] }}">
+            <div class="drag-handle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0 -18v6h8V3h-8z" />
+                </svg>
+            </div>
+            <p><b>{{ note['content'] }} - Created Date: {{ note['saved_time'] }}</b></p>
+            <!-- 编辑按钮 -->
+            <a href="{{ url_for('edit_note', note_id=note['ID']) }}" class="edit action-button">Edit</a>
+            <!-- 删除按钮 -->
+            <a href="{{ url_for('delete_confirm', note_id=note['ID']) }}" class="delete action-button">Delete</a>
+            <!-- 颜色标记表单 -->
+            <form action="/update_color" method="post" class="color-form action-form">
+                <input type="hidden" name="note_id" value="{{ note['ID'] }}">
+                <select name="new_color_tag">
+                    <option value="red">High</option>
+                    <option value="orange">Medium</option>
+                    <option value="green">Low</option>
+                </select>
+                <input type="submit" value="更新颜色">
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <form action="/add" method="post" class="add-note-form">
+        <input type="text" name="content" required>
+        <input type="submit" value="Add Note">
+    </form>
+    <script>
+        window.onload = function () {
+            // 根据用户登录状态来判断是否获取登录按钮并添加点击事件监听
+            {% if 'user_id' not in session %}
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.addEventListener('click', function () {
+                    window.location.href = "/login";
+                });
+            }
+            {% endif %}
+
+            // 给登出按钮添加点击事件监听
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function () {
+                    window.location.href = "/logout";
+                });
+            }
+
+            // 给用户管理链接添加点击事件监听（如果是管理员登录才显示该链接，所以这里确保元素存在再添加事件）
+            const userManagementLink = document.getElementById('userManagementLink');
+            if (userManagementLink) {
+                userManagementLink.addEventListener('click', function () {
+                    window.location.href = "/userManagement";
+                });
+            }
+
+            // 创建Sortable实例，使笔记列表可拖拽排序，指定handle选项为.drag-handle元素来实现通过图标拖拽
+            const notesList = document.getElementById('notes-list');
+            const sortable = Sortable.create(notesList, {
+                group: "notes",
+                animation: 150,
+                handle: '.drag-handle',
+                onStart: function (evt) {
+                    evt.item.classList.add('sortable-dragging');
+                },
+                onEnd: function (evt) {
+                    evt.item.classList.remove('sortable-dragging');
+                    const noteIds = Array.from(notesList.children).map(li => li.dataset.noteId);
+                    fetch('/update_order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(noteIds)
+                    })
+                 .then(response => response.json())
+                 .then(data => {
+                        if (data.error) {
+                            console.error(data.error);
+                        } else {
+                            console.log(data.message);
+                        }
+                    })
+                 .catch(error => console.error('Error:', error));
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>

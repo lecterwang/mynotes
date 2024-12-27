@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            padding: 20px 0;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background-color: #e9ecef;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        /* 美化Back to Notes链接的样式类 */
+     .back-link {
+            display: block;
+            text-align: center;
+            margin: 20px auto;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #6c757d; /* 采用与整体风格协调的灰色调，与表头背景色等相呼应 */
+            font-weight: normal; /* 保持常规字体粗细，贴合整体简洁性 */
+            border: 1px solid #dee2e6; /* 添加浅灰色边框，增加一点细节但不过分突出 */
+            border-radius: 3px; /* 保持与按钮一致的圆角效果 */
+            transition: color 0.2s ease, border-color 0.2s ease; /* 鼠标悬停时颜色和边框颜色变化过渡效果 */
+        }
+
+     .back-link:hover {
+            color: #5a6268; /* 鼠标悬停时颜色略变深，增强交互反馈 */
+            border-color: #5a6268; /* 鼠标悬停时边框颜色也相应变化，保持统一 */
+        }
+
+     .admin-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+     .admin-button:hover {
+            background-color: #0056b3;
+        }
+
+     .remove-admin-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+     .remove-admin-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>User Management</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Is Admin</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user[0] }}</td>
+            <td>{{ user[1] }}</td>
+            <td>{{ user[3] }}</td>
+            <td>
+                {% if user[3] == 0 %}
+                <form action="{{ url_for('set_admin', user_id=user[0]) }}" method="post">
+                    <button class="admin-button" type="submit">Set as Admin</button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('remove_admin', user_id=user[0]) }}" method="post">
+                    <button class="remove-admin-button" type="submit">Remove Admin</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <!-- 应用美化后的样式类到链接上 -->
+    <a href="{{ url_for('index') }}" class="back-link">Back to Notes</a>
+</body>
+
+</html>
